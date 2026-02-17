@@ -109,6 +109,17 @@ export default function Recommendations() {
         >
           {isLoadingAnalysis ? "Generating..." : "Generate Analysis & Recommendations"}
         </button>
+
+        {!canGenerate && groupId && !isLoadingAnalysis && (
+          <div className="text-xs space-y-1">
+            <p className={status?.has_report ? "text-green-500" : "text-theme-accent"}>
+              {status?.has_report ? "✓ Files Uploaded" : "⚠ No Files Uploaded (Go to 'Files' tab first)"}
+            </p>
+            <p className={status?.has_syllabus ? "text-green-500" : "text-theme-accent"}>
+              {status?.has_syllabus ? "✓ Syllabus Saved" : "⚠ Syllabus Not Saved (Go to 'Syllabus' tab and click 'Save')"}
+            </p>
+          </div>
+        )}
       </div>
 
       {/* Search Section */}

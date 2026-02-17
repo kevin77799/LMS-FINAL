@@ -36,10 +36,38 @@ def youtube_recommendations(search_keyword: str, min_duration_sec: int = 30) -> 
                         videos.append({"id": v_id, "title": v_title})
                 
                 if videos:
-                    print(f"[SUCCESS] Found {len(videos)} YouTube videos via SerpAPI")
+                    print(f"[SUCCESS] Found {len(videos)} YouTube videos via SerpAPI (youtube engine)")
                     return videos[:10]
                 else:
-                    print(f"[WARNING] SerpAPI returned no videos for: {q}")
+                    print(f"[WARNING] SerpAPI YouTube engine returned no results. Keys present: {list(data.keys())}")
+                    # Try Fallback: Google Video search (Often more reliable)
+                    print(f"[DEBUG] Attempting Fallback: Google Video engine for: {q}")
+                    params["engine"] = "google"
+                    params["q"] = q
+                    params["tbm"] = "vid"
+                    # Remove search_query if switching to google engine
+                    params.pop("search_query", None)
+                    
+                    fb_res = requests.get("https://serpapi.com/search", params=params, timeout=10)
+                    if fb_res.status_code == 200:
+                        fb_data = fb_res.json()
+                        fb_results = fb_data.get("video_results", [])
+                        if not fb_results: fb_results = fb_data.get("organic_results", [])
+                        
+                        for v in fb_results:
+                            # Parse YouTube links from Google search results
+                            link = v.get("link", "")
+                            if "youtube.com/watch?v=" in link:
+                                v_id = link.split("v=")[1].split("&")[0]
+                                v_title = v.get("title")
+                                if v_id and v_title:
+                                    videos.append({"id": v_id, "title": v_title})
+                        
+                        if videos:
+                            print(f"[SUCCESS] Found {len(videos)} YouTube videos via SerpAPI (google fallback)")
+                            return videos[:10]
+                    else:
+                        print(f"[ERROR] SerpAPI Google Videos fallback failed: {fb_res.text}")
             else:
                 print(f"[ERROR] SerpAPI YouTube failed with status {response.status_code}: {response.text}")
         except Exception as e:

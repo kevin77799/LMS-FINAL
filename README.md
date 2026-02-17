@@ -1,3 +1,13 @@
+---
+title: LMS Backend
+emoji: 🎓
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_file: app.py
+pinned: false
+---
+
 ## Student Analyzer AI - FastAPI Backend
 
 This backend mirrors the Streamlit app's features via REST:

@@ -1,11 +1,12 @@
-from typing import List
-from datetime import datetime
+import os
 import random
 import string
-
+import requests
+from typing import List
+from datetime import datetime
 from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks
 
-from ..db import conn, hash_password, log_action
+from ..core.config import RESEND_API_KEY
 from ..db import conn, hash_password, log_action
 from ..schemas import (
     SignupRequest, 
@@ -200,20 +201,36 @@ load_dotenv()
 # ... (imports)
 
 def send_email(to_email: str, subject: str, body: str):
-    # Debug: Re-load dotenv explicitly to be sure
-    load_dotenv()
-    
+    # Professional Choice: Resend API (Works on Hugging Face)
+    if RESEND_API_KEY:
+        try:
+            print(f"[DEBUG] Sending professional email via Resend to {to_email}")
+            response = requests.post(
+                "https://api.resend.com/emails",
+                headers={
+                    "Authorization": f"Bearer {RESEND_API_KEY}",
+                    "Content-Type": "application/json",
+                },
+                json={
+                    "from": os.getenv("EMAIL_SENDER", "LMS Admin <onboarding@resend.dev>"),
+                    "to": to_email,
+                    "subject": subject,
+                    "text": body,
+                }
+            )
+            if response.status_code in [200, 201]:
+                print(f"[SUCCESS] Email sent via Resend")
+                return True
+            else:
+                print(f"[ERROR] Resend API failed: {response.text}")
+        except Exception as e:
+            print(f"[ERROR] Exception in Resend call: {e}")
+
+    # Fallback to Gmail SMTP (Often blocked on Free Cloud Tiers)
     sender_email = os.getenv("EMAIL_SENDER")
     sender_password = os.getenv("EMAIL_PASSWORD")
     
-    # Debugging print
-    if not sender_email:
-        print(f"[DEBUG] CWD: {os.getcwd()}")
-        print(f"[DEBUG] .env exists? {os.path.exists('.env')}")
-        print(f"[DEBUG] EMAIL_SENDER is None. All env keys: {[k for k in os.environ.keys() if 'EMAIL' in k]}")
-
     if not sender_email or not sender_password:
-        print("[WARNING] Email credentials not found in .env. OTP printed to console instead.")
         return False
 
     try:
@@ -223,14 +240,14 @@ def send_email(to_email: str, subject: str, body: str):
         msg['Subject'] = subject
         msg.attach(MIMEText(body, 'plain'))
 
-        # Connect to Gmail SMTP server
         with smtplib.SMTP('smtp.gmail.com', 587) as server:
+            server.set_timeout(5) # Don't hang the server
             server.starttls()
             server.login(sender_email, sender_password)
             server.send_message(msg)
         return True
     except Exception as e:
-        print(f"[ERROR] Failed to send email: {e}")
+        print(f"[ERROR] SMTP Mail failed: {e}")
         return False
 
 @router.post("/auth/generate-otp")

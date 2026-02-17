@@ -22,5 +22,7 @@ SERP_API_KEY: Optional[str] = (
 
 DB_PATH: str = os.getenv("DB_PATH", "student_analyzer.db")
 DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
+RESEND_API_KEY: Optional[str] = os.getenv("RESEND_API_KEY")
+EMAIL_SENDER: Optional[str] = os.getenv("EMAIL_SENDER")
 
 

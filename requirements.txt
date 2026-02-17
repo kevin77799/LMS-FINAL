@@ -16,4 +16,5 @@ PyYAML>=6.0
 phidata>=2.4.0
 pandas>=2.0.0
 gunicorn>=21.0.0
+psycopg2-binary>=2.9.9
 

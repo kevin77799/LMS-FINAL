@@ -9,6 +9,7 @@ load_dotenv()
 API_KEYS: List[str] = [
     key for key in [
         os.getenv("GOOGLE_API_KEY_1"),
+        os.getenv("GOOGLE_API_KEY"),
         os.getenv("GOOGLE_API_KEY_2"),
         os.getenv("GOOGLE_API_KEY_3"),
         os.getenv("GOOGLE_API_KEY_4"),
@@ -20,5 +21,6 @@ SERP_API_KEY: Optional[str] = (
 )
 
 DB_PATH: str = os.getenv("DB_PATH", "student_analyzer.db")
+DATABASE_URL: Optional[str] = os.getenv("DATABASE_URL")
 
 

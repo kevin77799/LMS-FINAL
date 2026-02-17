@@ -11,11 +11,11 @@ load_dotenv()
 # This configures the google-generativeai library with your primary API key at startup
 # It's a good practice to have a default key configured.
 # Your other functions can still rotate keys if this one is rate-limited.
-api_key = os.getenv("GOOGLE_API_KEY_1")
+api_key = os.getenv("GOOGLE_API_KEY_1") or os.getenv("GOOGLE_API_KEY")
 if api_key:
     genai.configure(api_key=api_key)
 else:
-    print("WARNING: GOOGLE_API_KEY_1 not found in .env file. Some features may not work.")
+    print("WARNING: GOOGLE_API_KEY_1 or GOOGLE_API_KEY not found. Some features may not work.")
 # ----------------------------------------------------------------
 
 from .db import init_db

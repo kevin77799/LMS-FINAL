@@ -3,7 +3,7 @@ from datetime import datetime
 import random
 import string
 
-from fastapi import APIRouter, HTTPException, UploadFile, File
+from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks
 
 from ..db import conn, hash_password, log_action
 from ..db import conn, hash_password, log_action
@@ -234,7 +234,7 @@ def send_email(to_email: str, subject: str, body: str):
         return False
 
 @router.post("/auth/generate-otp")
-def generate_setup_otp(req: AdminGenerateOtpRequest):
+def generate_setup_otp(req: AdminGenerateOtpRequest, background_tasks: BackgroundTasks):
     c = conn.cursor()
     try:
         c.execute("SELECT COUNT(*) FROM admin_users")
@@ -245,8 +245,9 @@ def generate_setup_otp(req: AdminGenerateOtpRequest):
     
     code = ''.join(random.choices(string.digits, k=6))
     
-    # Send Email
-    email_sent = send_email(
+    # Send Email in background so we don't block the response
+    background_tasks.add_task(
+        send_email,
         req.email, 
         "LMS Admin Verification Code", 
         f"Your verification code for Admin Setup is: {code}\n\nThis code expires in 10 minutes."
@@ -259,11 +260,7 @@ def generate_setup_otp(req: AdminGenerateOtpRequest):
     c.execute("INSERT INTO admin_otp (code, created_at) VALUES (?, ?)", (code, datetime.now().isoformat()))
     conn.commit()
     
-    msg = f"Verification code sent to {req.email}"
-    if not email_sent:
-        msg += " (Email failed/not configured. CHECK SERVER CONSOLE)."
-        
-    return {"message": msg}
+    return {"message": f"Verification code processed for {req.email}. If email does not arrive, check server logs (Hugging Face)."}
 
 
 @router.post("/auth/setup")

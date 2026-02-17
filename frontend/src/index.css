@@ -1,0 +1,75 @@
+@import "tailwindcss";
+
+
+@layer base {
+  :root {
+    /* Emerald Theme (Default/Fallbacks) - Enthusiastic Green */
+    --theme-bg: #022c22;
+    --theme-surface: #064e3b;
+    --theme-accent: #34d399;
+    --theme-accent-hover: #10b981;
+    --theme-text: #ecfdf5;
+    --theme-text-secondary: #a7f3d0;
+    --theme-border: #059669;
+  }
+
+  [data-theme='emerald'] {
+    --theme-bg: #022c22;
+    /* Emerald 950 */
+    --theme-surface: #064e3b;
+    /* Emerald 900 */
+    --theme-accent: #34d399;
+    /* Emerald 400 */
+    --theme-accent-hover: #10b981;
+    /* Emerald 500 */
+    --theme-text: #ecfdf5;
+    /* Emerald 50 */
+    --theme-text-secondary: #a7f3d0;
+    /* Emerald 200 */
+    --theme-border: #059669;
+    /* Emerald 600 */
+  }
+
+  [data-theme='crimson'] {
+    --theme-bg: #450a0a;
+    /* Red 950 */
+    --theme-surface: #7f1d1d;
+    /* Red 900 */
+    --theme-accent: #f87171;
+    /* Red 400 */
+    --theme-accent-hover: #ef4444;
+    /* Red 500 */
+    --theme-text: #fef2f2;
+    /* Red 50 */
+    --theme-text-secondary: #fecaca;
+    /* Red 200 */
+    --theme-border: #b91c1c;
+    /* Red 700 */
+  }
+
+  [data-theme='cyber'] {
+    /* Cyber/Neon Purple - High Energy */
+    --theme-bg: #0f172a;
+    /* Slate 900 base */
+    --theme-surface: #1e293b;
+    /* Slate 800 */
+    --theme-accent: #d946ef;
+    /* Fuchsia 500 */
+    --theme-accent-hover: #c026d3;
+    /* Fuchsia 600 */
+    --theme-text: #f8fafc;
+    /* Slate 50 */
+    --theme-text-secondary: #cbd5e1;
+    /* Slate 300 */
+    --theme-border: #a855f7;
+    /* Purple 500 */
+  }
+
+  body {
+    background-color: var(--theme-bg);
+    color: var(--theme-text);
+    transition-property: color, background-color, border-color, text-decoration-color, fill, stroke;
+    transition-timing-function: cubic-bezier(0.4, 0, 0.2, 1);
+    transition-duration: 300ms;
+  }
+}

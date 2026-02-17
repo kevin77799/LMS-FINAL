@@ -317,15 +317,31 @@ def setup_admin(req: AdminSetupRequest):
 def login_admin(req: AdminLoginRequest):
     c = conn.cursor()
     try:
-        # Need to handle potential missing column if migration failed silently, but let's assume it worked.
-        # Fallback for admin_code is safe.
         c.execute("SELECT id, username, admin_code FROM admin_users WHERE username=? AND password=?", (req.username, hash_password(req.password)))
         row = c.fetchone()
+        
         if not row:
+            print(f"[AUTH] Login failed for user: {req.username} - No user found")
             raise HTTPException(status_code=401, detail="Invalid credentials")
         
-        return {"admin_id": row[0], "username": row[1], "admin_code": row[2] or "N/A"}
-    except Exception:
+        # Robust access for both tuple and dict rows
+        try:
+            admin_id = int(row[0]) if not hasattr(row, 'get') else int(row.get('id', 0))
+            username = row[1] if not hasattr(row, 'get') else row.get('username')
+            admin_code = row[2] if not hasattr(row, 'get') else row.get('admin_code')
+        except (IndexError, KeyError, TypeError, ValueError) as e:
+            print(f"[AUTH] Error parsing row data: {e} | Row: {row}")
+            raise HTTPException(status_code=500, detail="Internal server error parsing user data")
+        
+        return {
+            "admin_id": admin_id, 
+            "username": username, 
+            "admin_code": admin_code or "N/A"
+        }
+    except HTTPException:
+        raise
+    except Exception as e:
+        print(f"[AUTH] Unexpected error: {e}")
         raise HTTPException(status_code=401, detail="Invalid credentials")
 
 

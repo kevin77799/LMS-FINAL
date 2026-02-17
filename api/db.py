@@ -52,7 +52,8 @@ class SmartCursor:
         return self.cursor.lastrowid
 
     def fetchone(self):
-        return self.cursor.fetchone()
+        row = self.cursor.fetchone()
+        return row
 
     def fetchall(self):
         return self.cursor.fetchall()
@@ -124,10 +125,16 @@ def init_db() -> SmartConn:
     
     # Migrations for existing tables
     try:
+        c.execute("ALTER TABLE admin_users ADD COLUMN admin_code TEXT")
+        print("Migrated admin_users: added admin_code column")
+    except Exception: pass
+
+    try:
         if is_postgres:
             c.execute("ALTER TABLE users ADD COLUMN admin_id INTEGER REFERENCES admin_users(id)")
         else:
             c.execute("ALTER TABLE users ADD COLUMN admin_id INTEGER")
+        print("Migrated users: added admin_id column")
     except Exception: pass
 
     run_create('''CREATE TABLE IF NOT EXISTS admin_otp (

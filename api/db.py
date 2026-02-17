@@ -109,14 +109,14 @@ def init_db() -> SmartConn:
         c.execute(sql)
 
     run_create('''CREATE TABLE IF NOT EXISTS admin_users (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    username TEXT UNIQUE,
                    email TEXT,
                    password TEXT,
                    admin_code TEXT UNIQUE)''')
 
     run_create('''CREATE TABLE IF NOT EXISTS users (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    username TEXT UNIQUE,
                    password TEXT,
                    course_id TEXT,
@@ -142,13 +142,13 @@ def init_db() -> SmartConn:
                    created_at TEXT)''')
 
     run_create('''CREATE TABLE IF NOT EXISTS file_groups (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    user_id INTEGER REFERENCES users(id),
                    group_name TEXT,
                    created_at TEXT)''')
 
     run_create('''CREATE TABLE IF NOT EXISTS files (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    group_id INTEGER REFERENCES file_groups(id),
                    file_name TEXT,
                    file_type TEXT,
@@ -156,20 +156,20 @@ def init_db() -> SmartConn:
                    uploaded_at TEXT)''')
 
     run_create('''CREATE TABLE IF NOT EXISTS syllabus (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    course_id TEXT,
                    syllabus_content TEXT,
                    saved_at TEXT)''')
 
     run_create('''CREATE TABLE IF NOT EXISTS syllabus_for_students (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    group_id TEXT,
                    syllabus_content TEXT,
                    topics_ratings TEXT,
                    saved_at TEXT)''')
 
     run_create('''CREATE TABLE IF NOT EXISTS analysis_results (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    group_id INTEGER UNIQUE REFERENCES file_groups(id),
                    analysis TEXT,
                    timetable TEXT,
@@ -184,7 +184,7 @@ def init_db() -> SmartConn:
                    created_at TEXT)''')
 
     run_create('''CREATE TABLE IF NOT EXISTS chat_history (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    user_id INTEGER REFERENCES users(id),
                    group_id INTEGER REFERENCES file_groups(id),
                    session_id TEXT REFERENCES chat_sessions(id),
@@ -196,7 +196,7 @@ def init_db() -> SmartConn:
     except Exception: pass
 
     run_create('''CREATE TABLE IF NOT EXISTS chat_history_image (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    user_id INTEGER REFERENCES users(id),
                    group_id INTEGER REFERENCES file_groups(id),
                    session_id TEXT REFERENCES chat_sessions(id),
@@ -210,7 +210,7 @@ def init_db() -> SmartConn:
     except Exception: pass
 
     run_create('''CREATE TABLE IF NOT EXISTS chat_history_video (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    user_id INTEGER REFERENCES users(id),
                    group_id INTEGER REFERENCES file_groups(id),
                    session_id TEXT REFERENCES chat_sessions(id),
@@ -224,7 +224,7 @@ def init_db() -> SmartConn:
     except Exception: pass
 
     run_create('''CREATE TABLE IF NOT EXISTS session_history (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    user_id INTEGER REFERENCES users(id),
                    group_id INTEGER REFERENCES file_groups(id),
                    action TEXT,
@@ -233,7 +233,7 @@ def init_db() -> SmartConn:
     )
     
     run_create('''CREATE TABLE IF NOT EXISTS quiz_results (
-                   id SERIAL PRIMARY KEY,
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
                    user_id INTEGER REFERENCES users(id),
                    group_id INTEGER REFERENCES file_groups(id),
                    subject TEXT,

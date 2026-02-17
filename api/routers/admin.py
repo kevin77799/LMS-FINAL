@@ -326,7 +326,10 @@ def login_admin(req: AdminLoginRequest):
         
         # Robust access for both tuple and dict rows
         try:
-            admin_id = int(row[0]) if not hasattr(row, 'get') else int(row.get('id', 0))
+            # Fallback to 1 if id is None for some reason
+            raw_id = row[0] if not hasattr(row, 'get') else row.get('id')
+            admin_id = int(raw_id) if raw_id is not None else 1
+            
             username = row[1] if not hasattr(row, 'get') else row.get('username')
             admin_code = row[2] if not hasattr(row, 'get') else row.get('admin_code')
         except (IndexError, KeyError, TypeError, ValueError) as e:

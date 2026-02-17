@@ -105,7 +105,7 @@ export default function AdminLogin() {
         <div className="min-h-screen bg-theme-bg flex items-center justify-center p-4 relative">
             <button
                 onClick={() => nav("/")}
-                className="absolute top-4 left-4 flex items-center gap-2 text-theme-text-secondary hover:text-theme-accent transition-colors"
+                className="absolute top-4 left-4 flex items-center gap-2 text-theme-text-secondary hover:text-theme-accent transition-colors z-50 cursor-pointer"
                 aria-label="Back to Home"
             >
                 <ChevronLeft size={20} />
@@ -318,17 +318,15 @@ export default function AdminLogin() {
                                     {loading ? "Verifying..." : "Create Admin Account"}
                                 </button>
 
-                                {hasAdmin && (
-                                    <div className="text-center pt-2">
-                                        <button
-                                            type="button"
-                                            onClick={() => setMode("login")}
-                                            className="text-xs text-theme-accent hover:underline"
-                                        >
-                                            ← Back to Admin Login
-                                        </button>
-                                    </div>
-                                )}
+                                <div className="text-center pt-2">
+                                    <button
+                                        type="button"
+                                        onClick={() => setMode("login")}
+                                        className="text-xs text-theme-accent hover:underline"
+                                    >
+                                        ← Back to Admin Login
+                                    </button>
+                                </div>
                             </form>
                         )}
                     </div>

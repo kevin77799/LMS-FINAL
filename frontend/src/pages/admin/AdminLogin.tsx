@@ -10,6 +10,7 @@ export default function AdminLogin() {
     const [hasAdmin, setHasAdmin] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState<string | null>(null);
+    const [mode, setMode] = useState<"login" | "setup">("login");
 
     // Login State
     const [username, setUsername] = useState("");
@@ -29,6 +30,7 @@ export default function AdminLogin() {
         try {
             const res = await Admin.check();
             setHasAdmin(res.has_admin);
+            if (!res.has_admin) setMode("setup");
         } catch (e) {
             console.error(e);
         } finally {
@@ -111,7 +113,7 @@ export default function AdminLogin() {
                         {hasAdmin ? "Admin Portal" : "Admin Setup"}
                     </h1>
                     <p className="text-theme-text-secondary text-sm">
-                        {hasAdmin
+                        {mode === "login"
                             ? "Enter your credentials to access system controls."
                             : "Welcome! Verify your email to set up the admin account."}
                     </p>
@@ -131,7 +133,7 @@ export default function AdminLogin() {
                     </div>
                 )}
 
-                {hasAdmin ? (
+                {mode === "login" ? (
                     /* LOGIN FORM */
                     <form onSubmit={handleLogin} className="space-y-4">
                         <div className="space-y-1">
@@ -172,9 +174,19 @@ export default function AdminLogin() {
                             {loading ? "Authenticating..." : "Login to Dashboard"}
                         </button>
 
-                        <div className="text-center pt-2">
+                        <div className="text-center pt-2 space-y-2">
                             <p className="text-xs text-theme-text-secondary">
-                                New user? <NavLink to="/signup" className="text-theme-accent hover:underline font-semibold">Create Student Account</NavLink>
+                                Need a new Admin account?{" "}
+                                <button
+                                    type="button"
+                                    onClick={() => setMode("setup")}
+                                    className="text-theme-accent hover:underline font-semibold"
+                                >
+                                    Sign up as Admin
+                                </button>
+                            </p>
+                            <p className="text-xs text-theme-text-secondary border-t border-theme-border/30 pt-2">
+                                New student? <NavLink to="/signup" className="text-theme-accent hover:underline font-semibold">Create Student Account</NavLink>
                             </p>
                         </div>
                     </form>
@@ -297,6 +309,18 @@ export default function AdminLogin() {
                                     {loading && <RefreshCw size={16} className="animate-spin" />}
                                     {loading ? "Verifying..." : "Create Admin Account"}
                                 </button>
+
+                                {hasAdmin && (
+                                    <div className="text-center pt-2">
+                                        <button
+                                            type="button"
+                                            onClick={() => setMode("login")}
+                                            className="text-xs text-theme-accent hover:underline"
+                                        >
+                                            ← Back to Admin Login
+                                        </button>
+                                    </div>
+                                )}
                             </form>
                         )}
                     </div>

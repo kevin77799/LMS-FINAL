@@ -57,6 +57,10 @@ def create_app() -> FastAPI:
     app.include_router(health_router)
     app.include_router(perf_router)
 
+    @app.get("/")
+    def root():
+        return {"status": "online", "message": "LMS Backend is running"}
+
     return app
 
 

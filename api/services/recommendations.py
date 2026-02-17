@@ -21,15 +21,27 @@ def youtube_recommendations(search_keyword: str, min_duration_sec: int = 30) -> 
             }
             response = requests.get("https://serpapi.com/search", params=params, timeout=10)
             if response.status_code == 200:
-                results = response.json().get("video_results", [])
+                data = response.json()
+                results = data.get("video_results", [])
+                
+                # Check for alternative key if video_results is empty
+                if not results:
+                    results = data.get("results", [])
+                
                 videos = []
                 for v in results:
-                    v_id = v.get("video_id")
+                    v_id = v.get("video_id") or v.get("id")
                     v_title = v.get("title")
                     if v_id and v_title:
                         videos.append({"id": v_id, "title": v_title})
+                
                 if videos:
+                    print(f"[SUCCESS] Found {len(videos)} YouTube videos via SerpAPI")
                     return videos[:10]
+                else:
+                    print(f"[WARNING] SerpAPI returned no videos for: {q}")
+            else:
+                print(f"[ERROR] SerpAPI YouTube failed with status {response.status_code}: {response.text}")
         except Exception as e:
             print(f"SerpAPI YouTube error: {e}")
 

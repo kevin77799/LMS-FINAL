@@ -12,6 +12,7 @@ export const Admin = {
   generateOtp: (email: string) => api.post('/admin/auth/generate-otp', { email }).then(r => r.data),
   setup: (payload: any) => api.post('/admin/auth/setup', payload).then(r => r.data),
   login: (payload: any) => api.post('/admin/auth/login', payload).then(r => r.data),
+  signup: (payload: any) => api.post('/admin/auth/signup-student', payload).then(r => r.data),
   createUser: (payload: { username: string; password: string; course_id: string; education_level: string, admin_id: number }) =>
     api.post('/admin/users', payload).then(r => r.data),
   listUsers: () => api.get('/admin/users').then(r => r.data),

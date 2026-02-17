@@ -2,6 +2,14 @@ from typing import List, Optional, Dict, Any
 from pydantic import BaseModel, Field
 
 
+class StudentSignupRequest(BaseModel):
+    username: str
+    password: str
+    course_id: str
+    education_level: str
+    admin_code: str
+
+
 class LoginRequest(BaseModel):
     username: str
     password: str

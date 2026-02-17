@@ -6,6 +6,7 @@ colorTo: green
 sdk: docker
 app_file: app.py
 pinned: false
+persistent_storage: true
 ---
 
 ## Student Analyzer AI - FastAPI Backend

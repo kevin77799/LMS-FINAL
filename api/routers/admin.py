@@ -16,7 +16,8 @@ from ..schemas import (
     AdminSetupRequest, 
     AdminGenerateOtpRequest, 
     AdminLoginRequest, 
-    AdminLoginResponse
+    AdminLoginResponse,
+    StudentSignupRequest
 )
 
 
@@ -346,5 +347,34 @@ def login_admin(req: AdminLoginRequest):
     except Exception as e:
         print(f"[AUTH] Unexpected error: {e}")
         raise HTTPException(status_code=401, detail="Invalid credentials")
+
+
+@router.post("/auth/signup-student")
+def signup_student(req: StudentSignupRequest):
+    c = conn.cursor()
+    # 1. Resolve Admin Code to ID
+    c.execute("SELECT id FROM admin_users WHERE admin_code=?", (req.admin_code.upper(),))
+    row = c.fetchone()
+    if not row:
+        raise HTTPException(status_code=400, detail="Invalid Admin Verification Code")
+    
+    admin_id = row[0] if not hasattr(row, 'get') else row.get('id')
+
+    # 2. Check if username exists
+    c.execute("SELECT id FROM users WHERE username=?", (req.username,))
+    if c.fetchone():
+        raise HTTPException(status_code=400, detail="Username already taken")
+
+    # 3. Create User
+    try:
+        c.execute(
+            "INSERT INTO users (username, password, course_id, education_level, admin_id) VALUES (?, ?, ?, ?, ?)",
+            (req.username, hash_password(req.password), req.course_id, req.education_level, admin_id)
+        )
+        conn.commit()
+        return {"status": "ok", "message": "Student account created"}
+    except Exception as e:
+        print(f"[SIGNUP] Error: {e}")
+        raise HTTPException(status_code=500, detail="Failed to create account")
 
 

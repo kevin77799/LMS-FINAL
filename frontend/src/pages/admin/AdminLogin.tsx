@@ -1,5 +1,5 @@
 import { useState, useEffect } from "react";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, NavLink } from "react-router-dom";
 import { Admin } from "@/api/endpoints";
 import { Shield, Key, User, Lock, CheckCircle2, AlertCircle, RefreshCw, Mail } from "lucide-react";
 
@@ -171,6 +171,12 @@ export default function AdminLogin() {
                             {loading && <RefreshCw size={16} className="animate-spin" />}
                             {loading ? "Authenticating..." : "Login to Dashboard"}
                         </button>
+
+                        <div className="text-center pt-2">
+                            <p className="text-xs text-theme-text-secondary">
+                                New user? <NavLink to="/signup" className="text-theme-accent hover:underline font-semibold">Create Student Account</NavLink>
+                            </p>
+                        </div>
                     </form>
                 ) : (
                     /* SETUP FORM */

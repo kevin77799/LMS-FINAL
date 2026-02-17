@@ -1,5 +1,6 @@
 import { Route, Routes, Navigate } from "react-router-dom";
 import Login from "@/pages/Login";
+import Signup from "@/pages/Signup";
 import Dashboard from "@/pages/Dashboard";
 import Syllabus from "@/pages/Syllabus";
 import Recommendations from "@/pages/Recommendations";
@@ -20,6 +21,7 @@ export default function App() {
 
       <Routes>
         <Route path="/" element={<Login />} />
+        <Route path="/signup" element={<Signup />} />
         <Route path="/app" element={<AppLayout />}>
           <Route path="dashboard" element={<Dashboard />} />
           <Route path="syllabus" element={<Syllabus />} />

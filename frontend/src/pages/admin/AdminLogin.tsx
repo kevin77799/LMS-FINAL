@@ -1,7 +1,7 @@
 import { useState, useEffect } from "react";
 import { useNavigate, NavLink } from "react-router-dom";
 import { Admin } from "@/api/endpoints";
-import { Shield, Key, User, Lock, CheckCircle2, AlertCircle, RefreshCw, Mail } from "lucide-react";
+import { Shield, Key, User, Lock, CheckCircle2, AlertCircle, RefreshCw, Mail, ChevronLeft } from "lucide-react";
 
 export default function AdminLogin() {
     const nav = useNavigate();
@@ -102,7 +102,15 @@ export default function AdminLogin() {
     }
 
     return (
-        <div className="min-h-screen bg-theme-bg flex items-center justify-center p-4">
+        <div className="min-h-screen bg-theme-bg flex items-center justify-center p-4 relative">
+            <button
+                onClick={() => nav("/")}
+                className="absolute top-4 left-4 flex items-center gap-2 text-theme-text-secondary hover:text-theme-accent transition-colors"
+                aria-label="Back to Home"
+            >
+                <ChevronLeft size={20} />
+                <span className="text-sm font-medium">Back to Home</span>
+            </button>
             <div className="max-w-md w-full bg-theme-surface border border-theme-border rounded-xl shadow-2xl p-8 space-y-6 animate-in fade-in zoom-in duration-300">
 
                 <div className="text-center space-y-2">

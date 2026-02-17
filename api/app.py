@@ -36,12 +36,8 @@ def create_app() -> FastAPI:
 
     app.add_middleware(
         CORSMiddleware,
-        allow_origins=[
-            "*",
-            "https://lms-final-git-main-kevin-jrs-projects.vercel.app",
-            "https://lms-final.vercel.app"
-        ],
-        allow_credentials=True,
+        allow_origins=["*"],
+        allow_credentials=False,
         allow_methods=["*"],
         allow_headers=["*"],
     )

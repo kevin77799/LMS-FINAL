@@ -216,11 +216,14 @@ def extract_video_id(url: str) -> Optional[str]:
 def get_youtube_video_title(url: str) -> str:
     """Fetches the title of a YouTube video from its URL."""
     try:
-        html = urllib.request.urlopen(url, timeout=5).read().decode()
-        title_search = re.search(r"<title>(.*?)</title>", html)
-        if title_search:
-            title = title_search.group(1).replace(" - YouTube", "").strip()
-            return title
+        # Use requests which is more robust than urllib
+        resp = requests.get(url, timeout=10)
+        if resp.status_code == 200:
+            html = resp.text
+            title_search = re.search(r"<title>(.*?)</title>", html)
+            if title_search:
+                title = title_search.group(1).replace(" - YouTube", "").strip()
+                return title
     except Exception as e:
         print(f"Could not fetch video title for {url}: {e}")
     return "Unknown Title"
@@ -234,6 +237,8 @@ def chat_video(group_id: int, body: VideoChatRequest):
     vid = extract_video_id(body.video_url)
     if not vid:
         raise HTTPException(status_code=400, detail="Invalid or unsupported YouTube URL.")
+
+    # ... (db queries skipped for brevity in replacement, assuming context lines match)
 
     c = conn.cursor()
     c.execute("SELECT syllabus_content FROM syllabus_for_students WHERE group_id=?", (group_id,))
@@ -252,6 +257,14 @@ def chat_video(group_id: int, body: VideoChatRequest):
         transcript = YouTubeTranscriptApi.get_transcript(vid)
         transcript_text = ' '.join([i['text'] for i in transcript])
         context_for_prompt = f"Context from Video Transcript: {transcript_text}"
+    except AttributeError:
+        # Debugging the weird 'no attribute' error
+        print(f"DEBUG: YouTubeTranscriptApi attributes: {dir(YouTubeTranscriptApi)}")
+        context_for_prompt = (
+             "Context: The transcript for this video is unavailable (API Error). "
+             "Please answer the user's question about the video using your general knowledge and web search capabilities. "
+             f"The video title is '{video_title}'."
+        )
     except Exception as e:
         print(f"Could not fetch transcript for video {vid}: {e}")
         context_for_prompt = (

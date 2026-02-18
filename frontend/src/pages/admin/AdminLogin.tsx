@@ -107,7 +107,7 @@ export default function AdminLogin() {
                 onClick={() => nav("/")}
                 className="absolute top-4 left-4 flex items-center gap-2 text-theme-text-secondary hover:text-theme-accent transition-colors z-50 cursor-pointer"
                 aria-label="Back to Home"
-            >
+            >s
                 <ChevronLeft size={20} />
                 <span className="text-sm font-medium">Back to Home</span>
             </button>

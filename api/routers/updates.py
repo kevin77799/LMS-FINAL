@@ -38,7 +38,7 @@ async def create_update(
     return UpdateResponse(
         id=update_id, 
         content=content, 
-        image_url=f"/api/updates/{update_id}/image" if image_data else None,
+        image_url=f"/updates/{update_id}/image" if image_data else None,
         external_url=external_url, 
         created_at=created_at
     )
@@ -101,7 +101,7 @@ def get_course_updates(course_id: str, user_id: Optional[int] = None):
             combined.append(UpdateResponse(
                 id=update_id, 
                 content=row[1], 
-                image_url=f"/api/updates/{update_id}/image" if has_image else None,
+                image_url=f"/updates/{update_id}/image" if has_image else None,
                 external_url=row[3], 
                 created_at=row[4]
             ))

@@ -310,9 +310,15 @@ export default function Dashboard() {
 
                   {/* 2. Image (JPEG/IMG itself) */}
                   {item.image_url && (
-                    <div className="mt-3 rounded-lg overflow-hidden border border-theme-border relative group/img cursor-pointer" onClick={() => setSelectedImage(item.image_url)}>
+                    <div className="mt-3 rounded-lg overflow-hidden border border-theme-border relative group/img cursor-pointer"
+                      onClick={() => {
+                        const apiBase = import.meta.env.VITE_API_URL || '/api';
+                        const fullUrl = item.image_url.startsWith('http') ? item.image_url : `${apiBase}${item.image_url}`;
+                        setSelectedImage(fullUrl);
+                      }}
+                    >
                       <img
-                        src={item.image_url}
+                        src={item.image_url.startsWith('http') ? item.image_url : `${import.meta.env.VITE_API_URL || '/api'}${item.image_url}`}
                         alt="Update attachment"
                         className="w-full h-auto object-cover max-h-[300px] transition-all duration-500 group-hover/img:scale-110 group-hover/img:brightness-75"
                         onError={(e) => (e.currentTarget.style.display = 'none')}

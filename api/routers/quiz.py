@@ -22,7 +22,7 @@ router = APIRouter(prefix="/quizzes", tags=["quiz"])
 @router.post("/groups/{group_id}/generate", response_model=QuizModelResponse)
 def generate_quiz(group_id: int, req: QuizGenerateRequest):
     c = conn.cursor()
-    c.execute("SELECT file_content FROM files WHERE group_id=?", (group_id,))
+    c.execute("SELECT COALESCE(extracted_text, file_content) FROM files WHERE group_id=?", (group_id,))
     rows = c.fetchall()
     report = "".join([r[0] if isinstance(r[0], str) else str(r[0]) for r in rows])
     

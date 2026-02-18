@@ -133,7 +133,7 @@ with tabs[0]:
         new_username = st.text_input("Username")
         new_password = st.text_input("Password", type="password")
         new_course_id = st.text_input("Course ID")
-        new_education_level = st.selectbox("Select Grade", options=["8","9","10","11","12"])
+        new_education_level = st.selectbox("Select Year", options=["1","2","3","4"], format_func=lambda x: f"Year {x}")
         submitted = st.form_submit_button("Create User")
         if submitted:
             if all([new_username, new_password, new_course_id]):

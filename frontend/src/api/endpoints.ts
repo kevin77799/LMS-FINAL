@@ -27,6 +27,15 @@ export const Admin = {
   },
   listFiles: (group_id: number) => api.get(`/admin/groups/${group_id}/files`).then(r => r.data),
   deleteFile: (file_id: number) => api.delete(`/admin/files/${file_id}`).then(r => r.data),
+
+  // Course Files
+  uploadCourseFile: (course_id: string, file: File) => {
+    const form = new FormData()
+    form.append('file', file)
+    return api.post(`/admin/courses/${course_id}/files`, form).then(r => r.data)
+  },
+  listCourseFiles: (course_id: string) => api.get(`/admin/courses/${course_id}/files`).then(r => r.data),
+
   getCourseSyllabus: (course_id: string) => api.get(`/admin/courses/${course_id}/syllabus`).then(r => r.data),
   saveCourseSyllabus: (course_id: string, syllabus_content: string) => api.put(`/admin/courses/${course_id}/syllabus`, { syllabus_content }).then(r => r.data),
 }
@@ -43,6 +52,7 @@ export const Files = {
     return api.post(`/groups/${group_id}/files`, form).then(r => r.data)
   },
   list: (group_id: number) => api.get(`/groups/${group_id}/files`).then(r => r.data),
+  getContent: (file_id: number) => api.get(`/files/${file_id}/content`).then(r => r.data),
   delete: (file_id: number) => api.delete(`/files/${file_id}`).then(r => r.data),
 }
 
@@ -114,6 +124,23 @@ export const Chat = {
 
 export const Performance = {
   list: (group_id: number, user_id: number) => api.get(`/groups/${group_id}/performance?user_id=${user_id}`).then(r => r.data),
+}
+
+export const Updates = {
+  createUpdate: (course_id: string, content: string, image?: File, external_url?: string) => {
+    const form = new FormData()
+    form.append('course_id', course_id)
+    form.append('content', content)
+    if (image) form.append('image', image)
+    if (external_url) form.append('external_url', external_url)
+    return api.post('/admin/updates', form).then(r => r.data)
+  },
+  createPoll: (course_id: string, question: string, options: { option_text: string }[]) =>
+    api.post('/admin/polls', { course_id, question, options }).then(r => r.data),
+  list: (course_id: string, user_id?: number) =>
+    api.get(`/courses/${course_id}/updates${user_id ? `?user_id=${user_id}` : ''}`).then(r => r.data),
+  vote: (user_id: number, option_id: number) =>
+    api.post('/polls/vote', { user_id, option_id }).then(r => r.data),
 }
 
 

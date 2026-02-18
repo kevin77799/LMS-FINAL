@@ -123,11 +123,10 @@ export default function Signup() {
                                 className="w-full bg-theme-bg border border-theme-border rounded-lg py-2 pl-10 pr-4 text-theme-text focus:border-theme-accent focus:ring-1 focus:ring-theme-accent outline-none appearance-none"
                                 required
                             >
-                                <option value="">Select Level</option>
-                                <option value="High School">High School</option>
-                                <option value="Bachelors">Bachelors</option>
-                                <option value="Masters">Masters</option>
-                                <option value="PhD">PhD</option>
+                                <option value="">Select Year</option>
+                                {[1, 2, 3, 4].map(y => (
+                                    <option key={y} value={String(y)}>Year {y}</option>
+                                ))}
                             </select>
                         </div>
                     </div>

@@ -4,7 +4,7 @@ import string
 import requests
 from typing import List
 from datetime import datetime
-from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks
+from fastapi import APIRouter, HTTPException, UploadFile, File, BackgroundTasks, Response
 
 from ..core.config import RESEND_API_KEY
 from ..db import conn, hash_password, log_action
@@ -174,6 +174,57 @@ def admin_save_course_syllabus(course_id: str, body: dict):
         )
     conn.commit()
     return {"status": "ok", "saved_at": saved_at}
+
+
+# Admin course file management
+@router.post("/courses/{course_id}/files", response_model=FileResponse)
+async def admin_upload_course_file(course_id: str, file: UploadFile = File(...)):
+    raw = await file.read()
+    content = _read_pdf_bytes_or_text(file.content_type, raw)
+    c = conn.cursor()
+    uploaded_at = datetime.now().isoformat()
+    # Note: group_id is NULL for course files
+    # file_content stores binary raw, extracted_text stores text for AI
+    c.execute(
+        "INSERT INTO files (course_id, file_name, file_type, file_content, extracted_text, uploaded_at) VALUES (?, ?, ?, ?, ?, ?)",
+        (course_id, file.filename, file.content_type, raw, content, uploaded_at),
+    )
+    conn.commit()
+    return FileResponse(id=c.lastrowid, file_name=file.filename, file_type=file.content_type, course_id=course_id, uploaded_at=uploaded_at)
+
+@router.get("/courses/files/{file_id}/download")
+def admin_download_course_file(file_id: int):
+    c = conn.cursor()
+    c.execute("SELECT file_name, file_type, file_content, extracted_text FROM files WHERE id=?", (file_id,))
+    row = c.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    file_name, file_type, content, ext_text = row
+    
+    # If ext_text is NULL, it's a legacy file where file_content IS the text
+    if ext_text is None:
+        # Convert to bytes if it's stored as a string
+        body = content.encode("utf-8") if isinstance(content, str) else content
+        return Response(
+            content=body,
+            media_type="text/plain",
+            headers={"Content-Disposition": f"attachment; filename={file_name}.txt"},
+        )
+    
+    return Response(
+        content=content,
+        media_type=file_type,
+        headers={"Content-Disposition": f"attachment; filename={file_name}"},
+    )
+
+
+@router.get("/courses/{course_id}/files", response_model=List[FileResponse])
+def admin_list_course_files(course_id: str):
+    c = conn.cursor()
+    c.execute("SELECT id, file_name, file_type, uploaded_at FROM files WHERE course_id=?", (course_id,))
+    rows = c.fetchall()
+    return [FileResponse(id=r[0], file_name=r[1], file_type=r[2], course_id=course_id, uploaded_at=r[3]) for r in rows]
 
 
 # --- Admin Auth ---

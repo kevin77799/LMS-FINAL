@@ -44,6 +44,7 @@ class FileResponse(BaseModel):
     id: int
     file_name: str
     file_type: str
+    course_id: Optional[str] = None
     uploaded_at: str
 
 
@@ -156,3 +157,45 @@ class AdminLoginResponse(BaseModel):
     admin_id: int
     username: str
     admin_code: str
+
+
+# --- Updates & Polls Schemas ---
+
+class UpdateCreateRequest(BaseModel):
+    course_id: str
+    content: str
+    image_url: Optional[str] = None
+    external_url: Optional[str] = None
+
+class PollOptionCreate(BaseModel):
+    option_text: str
+
+class PollCreateRequest(BaseModel):
+    course_id: str
+    question: str
+    options: List[PollOptionCreate]
+
+class VoteRequest(BaseModel):
+    user_id: int
+    option_id: int
+
+class UpdateResponse(BaseModel):
+    id: int
+    type: str = "update"
+    content: str
+    image_url: Optional[str] = None
+    external_url: Optional[str] = None
+    created_at: str
+
+class PollOptionResponse(BaseModel):
+    id: int
+    text: str
+    votes: int
+
+class PollResponse(BaseModel):
+    id: int
+    type: str = "poll"
+    question: str
+    options: List[PollOptionResponse]
+    user_voted_option_id: Optional[int] = None
+    created_at: str

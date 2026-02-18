@@ -1,7 +1,7 @@
 from datetime import datetime
 from typing import List
 
-from fastapi import APIRouter, UploadFile, File, HTTPException
+from fastapi import APIRouter, UploadFile, File, HTTPException, Response
 
 from ..db import conn, log_action
 from ..schemas import CreateGroupRequest, FileResponse
@@ -77,11 +77,37 @@ def list_files(group_id: int):
     return [FileResponse(id=r[0], file_name=r[1], file_type=r[2], uploaded_at=r[3]) for r in rows]
 
 
+@router.get("/files/{file_id}/content")
+def get_file_content(file_id: int):
+    c = conn.cursor()
+    c.execute("SELECT file_name, file_content FROM files WHERE id=?", (file_id,))
+    row = c.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="File not found")
+    return {"file_name": row[0], "content": row[1]}
+
+
 @router.delete("/files/{file_id}")
 def delete_file(file_id: int):
     c = conn.cursor()
     c.execute("DELETE FROM files WHERE id=?", (file_id,))
     conn.commit()
     return {"status": "ok"}
+
+
+@router.get("/files/{file_id}/download")
+def download_file(file_id: int):
+    c = conn.cursor()
+    c.execute("SELECT file_name, file_content FROM files WHERE id=?", (file_id,))
+    row = c.fetchone()
+    if not row:
+        raise HTTPException(status_code=404, detail="File not found")
+    
+    file_name, content = row
+    return Response(
+        content=content,
+        media_type="text/plain",
+        headers={"Content-Disposition": f"attachment; filename={file_name}.txt"},
+    )
 
 

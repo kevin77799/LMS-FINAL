@@ -150,10 +150,23 @@ def init_db() -> SmartConn:
     run_create('''CREATE TABLE IF NOT EXISTS files (
                    id INTEGER PRIMARY KEY AUTOINCREMENT,
                    group_id INTEGER REFERENCES file_groups(id),
+                   course_id TEXT,
                    file_name TEXT,
                    file_type TEXT,
-                   file_content BYTEA,
+                   file_content BLOB,
                    uploaded_at TEXT)''')
+    
+    # Migration: Add course_id to files if missing
+    try:
+        c.execute("ALTER TABLE files ADD COLUMN course_id TEXT")
+        print("Migrated files: added course_id column")
+    except Exception: pass
+
+    # Migration: Add extracted_text to files for binary preservation
+    try:
+        c.execute("ALTER TABLE files ADD COLUMN extracted_text TEXT")
+        print("Migrated files: added extracted_text column")
+    except Exception: pass
 
     run_create('''CREATE TABLE IF NOT EXISTS syllabus (
                    id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -242,6 +255,42 @@ def init_db() -> SmartConn:
                    details TEXT)'''
     )
 
+    # Updates & Polls
+    run_create('''CREATE TABLE IF NOT EXISTS updates (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   course_id TEXT,
+                   content TEXT,
+                   image_path TEXT,
+                   external_url TEXT,
+                   image_data BLOB,
+                   created_at TEXT)'''
+    )
+
+    try:
+        c.execute("ALTER TABLE updates ADD COLUMN image_data BLOB")
+    except Exception: pass
+
+    run_create('''CREATE TABLE IF NOT EXISTS polls (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   course_id TEXT,
+                   question TEXT,
+                   created_at TEXT)'''
+    )
+
+    run_create('''CREATE TABLE IF NOT EXISTS poll_options (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   poll_id INTEGER REFERENCES polls(id),
+                   option_text TEXT)'''
+    )
+
+    run_create('''CREATE TABLE IF NOT EXISTS poll_votes (
+                   id INTEGER PRIMARY KEY AUTOINCREMENT,
+                   poll_id INTEGER REFERENCES polls(id),
+                   option_id INTEGER REFERENCES poll_options(id),
+                   user_id INTEGER REFERENCES users(id),
+                   UNIQUE(poll_id, user_id))'''
+    )
+
     conn.commit()
     return conn
 
@@ -259,6 +308,7 @@ def log_action(user_id: Optional[int], group_id: Optional[int], action: str, det
         (user_id, group_id, action, timestamp, details),
     )
     conn.commit()
+
 
 def get_group_report_text(group_id: int) -> str:
     c = conn.cursor()

@@ -31,7 +31,7 @@ def save_analysis_result(group_id: int, analysis: str, timetable: str, roadmap: 
 @router.post("/{group_id}/analysis")
 def perform_analysis(group_id: int):
     c = conn.cursor()
-    c.execute("SELECT file_content FROM files WHERE group_id=?", (group_id,))
+    c.execute("SELECT COALESCE(extracted_text, file_content) FROM files WHERE group_id=?", (group_id,))
     report_rows = c.fetchall()
     if not report_rows:
         raise HTTPException(status_code=400, detail="No report files found for this group.")

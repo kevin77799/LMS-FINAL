@@ -179,7 +179,7 @@ export default function Dashboard() {
   const loadUpdates = async () => {
     if (!user.course_id) return;
     try {
-      const list = await Updates.list(user.course_id, user.id);
+      const list = await Updates.list(user.course_id, user.user_id);
       setUpdates(list);
 
       if (list.length > 0) {
@@ -203,7 +203,7 @@ export default function Dashboard() {
 
   const handleVote = async (pollId: number, optionId: number) => {
     try {
-      await Updates.vote(user.id, optionId);
+      await Updates.vote(user.user_id, optionId);
       await loadUpdates(); // Reload to show results
     } catch (err) {
       alert("Vote failed or already voted");
